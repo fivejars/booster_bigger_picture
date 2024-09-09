@@ -1,0 +1,8 @@
+name: 'Bigger Picture'
+type: module
+description: 'Provides "Bigger Picture" lightbox library and formatters for Responsive image module integration.'
+package: FiveJars
+core_version_requirement: ^10
+dependencies:
+  - 'drupal:responsive_image'
+  - 'drupal:media_responsive_thumbnail'

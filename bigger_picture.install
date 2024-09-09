@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for Bigger picture.
+ *
+ * @ingroup bigger_picture
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function bigger_picture_install(): void {
+  // Set the weight to 1.
+  module_set_weight('bigger_picture', 1);
+}

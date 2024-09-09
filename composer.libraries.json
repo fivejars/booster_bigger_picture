@@ -1,0 +1,19 @@
+{
+    "repositories": {
+        "henrygd/bigger-picture": {
+            "type": "package",
+            "package": {
+                "name": "henrygd/bigger-picture",
+                "version": "1.1.17",
+                "type": "drupal-library",
+                "dist": {
+                    "url": "https://github.com/henrygd/bigger-picture/archive/refs/tags/v1.1.17.zip",
+                    "type": "zip"
+                }
+            }
+        }
+    },
+    "require": {
+        "henrygd/bigger-picture": "^1.1"
+    }
+}

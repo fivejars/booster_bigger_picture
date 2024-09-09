@@ -1,0 +1,21 @@
+library:
+  title: 'Bigger picture'
+  website: https://github.com/henrygd/bigger-picture
+  version: 1.x
+  license:
+    name: MIT
+    url: https://github.com/enyo/dropzone/blob/master/LICENSE
+    gpl-compatible: true
+  js:
+    /libraries/bigger-picture/dist/bigger-picture.min.js: { minified: true }
+  css:
+    component:
+      /libraries/bigger-picture/dist/bigger-picture.css: {}
+
+init:
+  js:
+    js/bigger-picture.init.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - bigger_picture/library

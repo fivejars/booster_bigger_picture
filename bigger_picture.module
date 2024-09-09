@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Bigger picture library integration.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ */
+function bigger_picture_theme(): array {
+  return [
+    // Extend theme hook for responsive images by passing attributes variable.
+    'responsive_image_formatter' => [
+      'variables' => [
+        'item' => NULL,
+        'item_attributes' => NULL,
+        'url' => NULL,
+        'responsive_image_style_id' => NULL,
+        'attributes' => NULL,
+      ],
+    ],
+  ];
+}
