@@ -152,9 +152,17 @@ class MediaResponsiveThumbnailFormatter extends OriginalFormatter {
       if ($source instanceof OEmbed) {
         /** @var string $value */
         $value = $source->getSourceFieldValue($media);
-        $element['#url'] = Url::fromUserInput($value);
+        $element['#url'] = $value;
         $element['#attributes']['data-type'] = 'iframe';
-        $element['#attributes']['data-iframe'] = $value;
+        $element['#attributes']['data-iframe'] = Url::fromRoute('media.oembed_iframe', [], [
+          'absolute' => TRUE,
+          'query' => [
+            'url' => $value,
+            'max_width' => 0,
+            'max_height' => 0,
+            'hash' => \Drupal::service('media.oembed.iframe_url_helper')->getHash($value, 0, 0),
+          ],
+        ])->toString();
         continue;
       }
 
@@ -180,6 +188,7 @@ class MediaResponsiveThumbnailFormatter extends OriginalFormatter {
 
         if ($image_link_style) {
           $image_link_style = $this->imageStyleStorage->load($image_link_style);
+          $this->renderer->addCacheableDependency($elements, $image_link_style);
         }
 
         /** @var ?\Drupal\image\ImageStyleInterface $image_link_style */
@@ -217,10 +226,6 @@ class MediaResponsiveThumbnailFormatter extends OriginalFormatter {
           'type' => $file->getMimeType(),
         ],
       ]);
-    }
-
-    if ($image_link_style) {
-      $this->renderer->addCacheableDependency($elements, $image_link_style);
     }
 
     return $elements;
