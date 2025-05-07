@@ -144,7 +144,7 @@ class MediaResponsiveThumbnailFormatter extends OriginalFormatter {
       if (!($media instanceof MediaInterface)) {
         continue;
       }
-
+      $element['#media'] = $media;
       $element['#attached']['library'][] = 'bigger_picture/init';
       $element['#attributes']['data-lightbox-group'] = $owner->id();
 
