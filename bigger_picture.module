@@ -19,7 +19,7 @@ function bigger_picture_theme(): array {
         'item_attributes' => NULL,
         'url' => NULL,
         'responsive_image_style_id' => NULL,
-        'attributes' => NULL,
+        'attributes' => [],
       ],
     ],
   ];
