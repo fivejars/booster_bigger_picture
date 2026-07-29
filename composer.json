@@ -5,7 +5,7 @@
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
-        "cweagans/composer-patches": "^1.5.0",
+        "cweagans/composer-patches": "^1.5.0 || ^2.0",
         "drupal/media_responsive_thumbnail": "^2.0"
     },
     "config": {
