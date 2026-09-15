@@ -1,0 +1,16 @@
+# Schema for the Bigger picture module.
+
+field.formatter.settings.media_responsive_thumbnail:
+  type: field.formatter.settings.responsive_image
+  label: 'Responsive thumbnail field formatter settings'
+  mapping:
+    image_link_style:
+      type: string
+      label: 'Image style for the image link'
+      nullable: true
+    image_link_styles_by_size:
+      type: sequence
+      label: 'Image styles by screen size'
+      sequence:
+        type: string
+        label: 'Image style'
