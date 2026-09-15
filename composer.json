@@ -1,7 +1,6 @@
 {
     "name": "fivejars/booster_bigger_picture",
     "description": "Integrate Bigger picture library with Booster Drupal theme.",
-    "version": "1.x-dev",
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
