@@ -9,10 +9,67 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Utility\UpdateException;
+
 /**
  * Implements hook_install().
  */
 function bigger_picture_install(): void {
   // Set the weight to 1.
   module_set_weight('bigger_picture', 1);
+}
+
+/**
+ * Take over the 'media_responsive_thumbnail' formatter and drop the module.
+ */
+function bigger_picture_update_11001(): string {
+  $module_handler = \Drupal::moduleHandler();
+
+  if (!$module_handler->moduleExists('media_responsive_thumbnail')) {
+    return (string) t('Media Responsive Thumbnail is not installed, nothing to do.');
+  }
+
+  // The formatter plugin is now provided by this module under the very same
+  // plugin ID, so re-saving the displays is enough to move their dependency
+  // over. Content and formatter settings are untouched.
+  $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
+  $resaved = 0;
+
+  /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display */
+  foreach ($storage->loadMultiple() as $display) {
+    $dependencies = $display->getDependencies();
+    $modules = $dependencies['module'] ?? [];
+
+    if (!is_array($modules) || !in_array('media_responsive_thumbnail', $modules, TRUE)) {
+      continue;
+    }
+
+    $display->save();
+    $resaved++;
+  }
+
+  // Never uninstall while config still points at the old module: the config
+  // manager would delete every one of those displays along with it.
+  $storage->resetCache();
+  $still_depending = [];
+
+  foreach ($storage->loadMultiple() as $display) {
+    $dependencies = $display->getDependencies();
+    $modules = $dependencies['module'] ?? [];
+
+    if (is_array($modules) && in_array('media_responsive_thumbnail', $modules, TRUE)) {
+      $still_depending[] = $display->id();
+    }
+  }
+
+  if ($still_depending !== []) {
+    throw new UpdateException(sprintf(
+      'These entity view displays still depend on media_responsive_thumbnail after being re-saved, so it was not uninstalled: %s',
+      implode(', ', $still_depending)
+    ));
+  }
+
+  \Drupal::service('module_installer')->uninstall(['media_responsive_thumbnail']);
+
+  return (string) t('Re-saved @count entity view displays and uninstalled Media Responsive Thumbnail.', ['@count' => $resaved]);
 }

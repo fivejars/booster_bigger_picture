@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\bigger_picture\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\file\Plugin\Field\FieldType\FileItem;
@@ -14,20 +16,21 @@ use Drupal\media\Plugin\media\Source\File;
 use Drupal\media\Plugin\media\Source\Image;
 use Drupal\media\Plugin\media\Source\OEmbed;
 use Drupal\media\Plugin\media\Source\VideoFile;
-use Drupal\media_responsive_thumbnail\Plugin\Field\FieldFormatter\MediaResponsiveThumbnailFormatter as OriginalFormatter;
 
 /**
- * Extended plugin implementation of the 'media_responsive_thumbnail' formatter.
+ * Plugin implementation of the 'media_responsive_thumbnail' formatter.
  *
- * @FieldFormatter(
- *   id = "media_responsive_thumbnail",
- *   label = @Translation("Responsive thumbnail"),
- *   field_types = {
- *     "entity_reference"
- *   }
- * )
+ * Adds "Bigger picture" lightbox support on top of the base formatter. The
+ * lightbox data attributes belong on the wrapping link, so they are passed as
+ * '#link_attributes'; '#attributes' stays reserved for the image itself, as
+ * core expects since Drupal 11.4.
  */
-class MediaResponsiveThumbnailFormatter extends OriginalFormatter {
+#[FieldFormatter(
+  id: 'media_responsive_thumbnail',
+  label: new TranslatableMarkup('Responsive thumbnail'),
+  field_types: ['entity_reference'],
+)]
+final class MediaResponsiveThumbnailFormatter extends MediaResponsiveThumbnailFormatterBase {
 
   /**
    * {@inheritdoc}
@@ -146,15 +149,15 @@ class MediaResponsiveThumbnailFormatter extends OriginalFormatter {
       }
       $element['#media'] = $media;
       $element['#attached']['library'][] = 'bigger_picture/init';
-      $element['#attributes']['data-lightbox-group'] = $owner->id();
+      $element['#link_attributes']['data-lightbox-group'] = $owner->id();
 
       $source = $media->getSource();
       if ($source instanceof OEmbed) {
         /** @var string $value */
         $value = $source->getSourceFieldValue($media);
         $element['#url'] = $value;
-        $element['#attributes']['data-type'] = 'iframe';
-        $element['#attributes']['data-iframe'] = Url::fromRoute('media.oembed_iframe', [], [
+        $element['#link_attributes']['data-type'] = 'iframe';
+        $element['#link_attributes']['data-iframe'] = Url::fromRoute('media.oembed_iframe', [], [
           'absolute' => TRUE,
           'query' => [
             'url' => $value,
@@ -197,10 +200,10 @@ class MediaResponsiveThumbnailFormatter extends OriginalFormatter {
         $value = (array) $media->get($source_field_name)->getValue();
         $value = reset($value);
         /** @var array{target_id: string, alt?: string, title?: string, width?: string, height?: string} $value */
-        $element['#attributes']['data-width'] = $value['width'] ?? '';
-        $element['#attributes']['data-height'] = $value['height'] ?? '';
-        $element['#attributes']['data-alt'] = $value['alt'] ?? '';
-        $element['#attributes']['data-caption'] = $value['title'] ?? '';
+        $element['#link_attributes']['data-width'] = $value['width'] ?? '';
+        $element['#link_attributes']['data-height'] = $value['height'] ?? '';
+        $element['#link_attributes']['data-alt'] = $value['alt'] ?? '';
+        $element['#link_attributes']['data-caption'] = $value['title'] ?? '';
 
         /** @var ?array<string, string> $image_link_styles_by_size */
         if ($image_link_styles_by_size = $this->getSetting('image_link_styles_by_size')) {
@@ -211,16 +214,16 @@ class MediaResponsiveThumbnailFormatter extends OriginalFormatter {
             $sizes[] = $image_link_style_by_size->buildUrl($file_uri) . ' ' . $size;
           }
 
-          $element['#attributes']['data-type'] = 'image';
-          $element['#attributes']['data-img'] = implode(', ', $sizes);
+          $element['#link_attributes']['data-type'] = 'image';
+          $element['#link_attributes']['data-img'] = implode(', ', $sizes);
         }
         continue;
       }
 
       $url = $file->createFileUrl();
       $element['#url'] = $url;
-      $element['#attributes']['data-type'] = $source instanceof VideoFile ? 'video' : 'audio';
-      $element['#attributes']['data-sources'] = json_encode([
+      $element['#link_attributes']['data-type'] = $source instanceof VideoFile ? 'video' : 'audio';
+      $element['#link_attributes']['data-sources'] = json_encode([
         [
           'src' => $url,
           'type' => $file->getMimeType(),
